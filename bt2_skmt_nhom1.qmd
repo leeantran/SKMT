@@ -1,0 +1,798 @@
+---
+title: "Time series regression studies in environmental epidemiology"
+subtitle: "Báo cáo tái lập nghiên cứu"
+author: "Nhóm 1 - Thạc sĩ Y học dự phóng"
+date: today
+date-format: "DD/MM/YYYY"
+lang: vi
+format:
+  revealjs:
+    theme: simple
+    slide-number: c/t
+    progress: true
+    transition: slide
+    background-transition: fade
+    transition-speed: default
+    center: false
+    width: 1280
+    height: 720
+    margin: 0.06
+    embed-resources: true
+    fig-dpi: 300
+    footer: '<a href="https://doi.org/10.1093/ije/dyt092" target="_blank" rel="noopener noreferrer">DOI: 10.1093/ije/dyt092</a>'
+    include-after-body:
+      - text: |
+          <style>
+            :root,
+            .reveal,
+            .reveal-viewport {
+              --epi-navy: #005d88;
+              --epi-teal: #1a9fcc;
+              --epi-blue: #2E86C1;
+              --epi-amber: #F39C12;
+              --epi-bg: #F4F8FB;
+              --r-main-font: "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif !important;
+              --r-heading-font: "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif !important;
+              --r-code-font: "Consolas", "Courier New", monospace !important;
+            }
+            /* Ghi đè triệt để font tiếng Việt trên toàn bộ slide (tránh lỗi News Cycle / Lato của theme simple) */
+            .reveal,
+            .reveal .slides,
+            .reveal .slides section,
+            .reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6,
+            .reveal p, .reveal li, .reveal td, .reveal th, .reveal blockquote,
+            .reveal div, .reveal span, .reveal a, .reveal em, .reveal strong,
+            .reveal .footer, .reveal .slide-number {
+              font-family: "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif !important;
+            }
+            .reveal {
+              font-size: 26px;
+              color: #0F172A;
+            }
+            .reveal h1, .reveal h2, .reveal h3 {
+              color: var(--epi-navy);
+              font-weight: 700;
+              letter-spacing: -0.01em;
+              text-transform: none !important;
+            }
+            .reveal h2 {
+              font-size: 1.42em;
+              border-bottom: 3px solid var(--epi-teal);
+              padding-bottom: 6px;
+              margin-bottom: 18px;
+            }
+            /* Slide tiêu đề & Slide chuyển mục nền tối: chữ màu trắng tuyệt đối */
+            .reveal #title-slide h1,
+            .reveal #title-slide h1.title,
+            .reveal #title-slide .title,
+            .reveal .title-slide h1,
+            .reveal section.dark-slide h1,
+            .reveal section.has-dark-background h1 {
+              color: #FFFFFF !important;
+              border: none !important;
+              text-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+            }
+            .reveal #title-slide h1.title {
+              font-size: 1.95em !important;
+              line-height: 1.22;
+            }
+            .reveal #title-slide .subtitle,
+            .reveal #title-slide p.subtitle,
+            .reveal #title-slide .quarto-title-author,
+            .reveal #title-slide .quarto-title-authors,
+            .reveal #title-slide .author,
+            .reveal #title-slide .date,
+            .reveal #title-slide p,
+            .reveal section.dark-slide h2,
+            .reveal section.dark-slide p,
+            .reveal section.dark-slide em,
+            .reveal section.dark-slide span {
+              color: #FFFFFF !important;
+            }
+            .reveal #title-slide .subtitle {
+              font-size: 1.10em;
+              margin-top: 14px;
+              opacity: 0.96;
+            }
+            .reveal #title-slide .quarto-title-author,
+            .reveal #title-slide .date {
+              font-size: 0.85em;
+              opacity: 0.92;
+            }
+            /* Footer có hyperlink DOI — rõ nét trên cả slide nền sáng lẫn nền tối */
+            .reveal .footer {
+              font-size: 0.60em !important;
+              font-weight: 600;
+              z-index: 30 !important;
+              pointer-events: auto !important;
+            }
+            .reveal .footer,
+            .reveal .footer p,
+            .reveal .footer a,
+            .reveal .footer a:visited {
+              color: var(--epi-navy) !important;
+              text-decoration: underline;
+              text-underline-offset: 3px;
+            }
+            .reveal .footer a:hover {
+              color: var(--epi-teal) !important;
+            }
+            .reveal.has-dark-background .footer,
+            .reveal.has-dark-background .footer p,
+            .reveal.has-dark-background .footer a,
+            .reveal.has-dark-background .footer a:visited,
+            .reveal.on-dark-slide .footer,
+            .reveal.on-dark-slide .footer p,
+            .reveal.on-dark-slide .footer a,
+            .reveal.on-dark-slide .footer a:visited {
+              color: #FFFFFF !important;
+            }
+            .reveal.on-dark-slide .footer a:hover,
+            .reveal.has-dark-background .footer a:hover {
+              color: #BAE6FD !important;
+            }
+            .reveal.on-dark-slide .slide-number,
+            .reveal.on-dark-slide .slide-number a,
+            .reveal.on-dark-slide .controls {
+              color: #FFFFFF !important;
+            }
+            .epi-card {
+              background: var(--epi-bg);
+              border-left: 5px solid var(--epi-navy);
+              border-radius: 6px;
+              padding: 14px 18px;
+              margin-bottom: 12px;
+              font-size: 0.84em;
+              line-height: 1.45;
+            }
+            .epi-card-amber {
+              background: #FFFBEB;
+              border-left: 5px solid var(--epi-amber);
+              border-radius: 6px;
+              padding: 14px 18px;
+              margin-bottom: 12px;
+              font-size: 0.84em;
+              line-height: 1.45;
+            }
+            .kpi-grid {
+              display: grid;
+              grid-template-columns: repeat(4, 1fr);
+              gap: 14px;
+              margin: 18px 0;
+            }
+            .kpi-box {
+              background: #FFFFFF;
+              border: 1px solid #CBD5E1;
+              border-top: 4px solid var(--epi-navy);
+              border-radius: 8px;
+              padding: 14px 12px;
+              text-align: center;
+              box-shadow: 0 2px 6px rgba(0, 93, 136, 0.08);
+            }
+            .kpi-val {
+              font-size: 1.55em;
+              font-weight: 800;
+              color: var(--epi-navy);
+            }
+            .kpi-lbl {
+              font-size: 0.68em;
+              color: #475569;
+              margin-top: 4px;
+            }
+            .small-text {
+              font-size: 0.78em;
+              line-height: 1.42;
+            }
+            .reveal table {
+              width: 100%;
+              border-collapse: collapse;
+              font-size: 0.62em;
+              margin: 0.4em 0;
+              box-shadow: 0 2px 6px rgba(0, 93, 136, 0.10);
+            }
+            .reveal table thead th {
+              background-color: var(--epi-navy);
+              color: #FFFFFF;
+              font-weight: 700;
+              padding: 8px 10px;
+              border-bottom: 2px solid #003b57;
+            }
+            .reveal table tbody td {
+              padding: 6px 10px;
+              border-bottom: 1px solid #CBD5E1;
+              color: #0F172A;
+            }
+            .reveal table tbody tr:nth-child(even) {
+              background-color: var(--epi-bg);
+            }
+            .reveal table tbody tr:hover {
+              background-color: #E0F2FE;
+            }
+          </style>
+          <script>
+            (function () {
+              function syncDarkSlideClass(slide) {
+                var revealEl = document.querySelector(".reveal");
+                if (!revealEl || !slide) return;
+                var isDark =
+                  slide.id === "title-slide" ||
+                  slide.classList.contains("dark-slide") ||
+                  slide.classList.contains("has-dark-background");
+                revealEl.classList.toggle("on-dark-slide", isDark);
+              }
+              document.addEventListener("DOMContentLoaded", function () {
+                if (typeof Reveal !== "undefined") {
+                  Reveal.on("ready", function (e) { syncDarkSlideClass(e.currentSlide); });
+                  Reveal.on("slidechanged", function (e) { syncDarkSlideClass(e.currentSlide); });
+                  syncDarkSlideClass(Reveal.getCurrentSlide());
+                }
+              });
+            })();
+          </script>
+title-slide-attributes:
+  data-background-color: "#005d88"
+  data-background-gradient: "linear-gradient(135deg, #003b57 0%, #005d88 55%, #1a9fcc 100%)"
+  data-transition: "zoom"
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+#| include: false
+
+library(foreign)
+library(splines)
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(ggplot2)
+library(scales)
+library(patchwork)
+library(dlnm)
+library(knitr)
+
+options(na.action = "na.exclude")
+
+pal <- list(
+  navy   = "#005d88",
+  teal   = "#1a9fcc",
+  blue   = "#2E86C1",
+  amber  = "#F39C12",
+  red    = "#C0392B",
+  slate  = "#64748B",
+  bg_row = "#F4F8FB"
+)
+
+theme_slide <- function(base_size = 12) {
+  theme_classic(base_size = base_size) +
+    theme(
+      text               = element_text(color = "#000000"),
+      plot.title         = element_text(face = "bold", size = rel(1.08), color = pal$navy, margin = margin(b = 4)),
+      plot.subtitle      = element_text(size = rel(0.88), color = "#334155", margin = margin(b = 6)),
+      axis.title         = element_text(face = "bold", color = "#000000", size = rel(0.95)),
+      axis.text          = element_text(color = "#000000", size = rel(0.88)),
+      axis.line          = element_line(color = "#000000", linewidth = 0.55),
+      axis.ticks         = element_line(color = "#000000", linewidth = 0.45),
+      panel.grid.major.y = element_line(color = "#E5E7EB", linewidth = 0.35, linetype = "dashed"),
+      legend.position    = "top",
+      legend.title       = element_text(face = "bold", size = rel(0.88)),
+      legend.text        = element_text(size = rel(0.85)),
+      plot.margin        = margin(6, 10, 6, 6)
+    )
+}
+
+style_slide_table <- function(df, font_sz = 13, align_left_cols = 1) {
+  align_vec <- rep("c", ncol(df))
+  align_vec[align_left_cols] <- "l"
+  knitr::kable(df, align = align_vec)
+}
+
+make_fourier <- function(t, nfreq = 4, period = 365.25) {
+  mat <- do.call(cbind, lapply(seq_len(nfreq), function(k) {
+    cbind(sin(2 * pi * k * t / period), cos(2 * pi * k * t / period))
+  }))
+  colnames(mat) <- as.vector(rbind(paste0("sin", seq_len(nfreq)), paste0("cos", seq_len(nfreq))))
+  mat
+}
+
+extract_rr <- function(model, term) {
+  coefs <- summary(model)$coefficients
+  est <- coefs[term, "Estimate"]
+  se  <- coefs[term, "Std. Error"]
+  pv  <- coefs[term, 4]
+  z   <- qnorm(0.975)
+  tibble(
+    rr     = exp(est),
+    ci_low = exp(est - z * se),
+    ci_hi  = exp(est + z * se),
+    pct    = (exp(est) - 1) * 100,
+    pval   = pv
+  )
+}
+
+get_pacf_df <- function(x, lag_max = 30) {
+  x_clean <- as.numeric(na.omit(x))
+  p_obj   <- pacf(x_clean, lag.max = lag_max, plot = FALSE)
+  tibble(
+    lag  = as.numeric(p_obj$lag),
+    pacf = as.numeric(p_obj$acf),
+    ci   = qnorm(0.975) / sqrt(length(x_clean))
+  )
+}
+
+fmt_p <- function(p) ifelse(p < 0.001, "< 0.001", sprintf("%.3f", p))
+
+# Đọc dữ liệu và chạy toàn bộ mô hình
+data <- read.dta("londondataset2002_2006.dta") |>
+  as_tibble() |>
+  mutate(
+    date      = as.Date(date),
+    time      = row_number(),
+    ozone10   = ozone / 10,
+    ym        = factor(format(date, "%Y-%m"))
+  )
+
+year_breaks <- as.Date(paste0(2002:2007, "-01-01"))
+
+model1 <- glm(numdeaths ~ ym, data = data, family = quasipoisson)
+data$pred1 <- predict(model1, type = "response")
+
+fourier <- make_fourier(data$time, nfreq = 4, period = 365.25)
+model2  <- glm(numdeaths ~ fourier + time, data = data, family = quasipoisson)
+data$pred2 <- predict(model2, type = "response")
+
+spl    <- bs(data$time, degree = 3, df = 35)
+model3 <- glm(numdeaths ~ spl, data = data, family = quasipoisson)
+data$pred3 <- predict(model3, type = "response")
+data$res3  <- residuals(model3, type = "response")
+
+model4 <- glm(numdeaths ~ ozone10, data = data, family = quasipoisson)
+model5 <- update(model4, . ~ . + spl)
+cutoffs <- quantile(data$temperature, probs = 0:10 / 10)
+data$tempdecile <- cut(data$temperature, breaks = cutoffs, include.lowest = TRUE)
+model6 <- update(model5, . ~ . + tempdecile)
+
+eff4 <- extract_rr(model4, "ozone10")
+eff5 <- extract_rr(model5, "ozone10")
+eff6 <- extract_rr(model6, "ozone10")
+
+tablag_single <- bind_rows(lapply(0:7, function(i) {
+  o3_lag <- dplyr::lag(data$ozone10, i)
+  t_lag  <- cut(dplyr::lag(data$temperature, i), breaks = cutoffs, include.lowest = TRUE)
+  mod    <- glm(numdeaths ~ o3_lag + t_lag + spl, data = data, family = quasipoisson)
+  extract_rr(mod, "o3_lag") |> mutate(lag = i)
+}))
+
+cbo3unc <- crossbasis(data$ozone, lag = c(0, 7), argvar = list(fun = "lin"), arglag = list(fun = "integer"))
+cbtempunc <- crossbasis(data$temperature, lag = c(0, 7), argvar = list(fun = "strata", breaks = cutoffs[2:10]), arglag = list(fun = "integer"))
+model7 <- glm(numdeaths ~ cbo3unc + cbtempunc + spl, data = data, family = quasipoisson)
+pred7  <- crosspred(cbo3unc, model7, cen = 0, at = 10)
+
+tablag_unc <- tibble(
+  lag = 0:7,
+  rr = as.numeric(pred7$matRRfit[1, ]),
+  ci_low = as.numeric(pred7$matRRlow[1, ]),
+  ci_hi = as.numeric(pred7$matRRhigh[1, ])
+)
+net_unc <- tibble(
+  rr = as.numeric(pred7$allRRfit[1]),
+  ci_low = as.numeric(pred7$allRRlow[1]),
+  ci_hi = as.numeric(pred7$allRRhigh[1])
+)
+
+cbo3constr <- crossbasis(data$ozone, lag = c(0, 7), argvar = list(fun = "lin"), arglag = list(fun = "strata", breaks = c(1, 3)))
+model8 <- glm(numdeaths ~ cbo3constr + cbtempunc + spl, data = data, family = quasipoisson)
+pred8  <- crosspred(cbo3constr, model8, cen = 0, at = 10)
+
+tablag_constr <- tibble(
+  lag = 0:7,
+  rr = as.numeric(pred8$matRRfit[1, ]),
+  ci_low = as.numeric(pred8$matRRlow[1, ]),
+  ci_hi = as.numeric(pred8$matRRhigh[1, ])
+)
+net_constr <- tibble(
+  rr = as.numeric(pred8$allRRfit[1]),
+  ci_low = as.numeric(pred8$allRRlow[1]),
+  ci_hi = as.numeric(pred8$allRRhigh[1])
+)
+
+data$res7 <- residuals(model7, type = "deviance")
+model9    <- update(model7, . ~ . + dplyr::lag(data$res7, 1))
+data$res9 <- residuals(model9, type = "deviance")
+max_death_df <- data |> slice_max(numdeaths, n = 1)
+```
+
+## 1. Mục tiêu & Thiết kế nghiên cứu {transition="convex"}
+
+:::: {.columns}
+::: {.column width="50%"}
+::: {.epi-card}
+**Mục tiêu nghiên cứu**
+
+- Trình bày phương pháp luận và hướng dẫn sử dụng **hồi quy chuỗi thời gian** trong dịch tễ học môi trường.
+- **Câu hỏi nghiên cứu:** Biến động nồng độ **ozone** hằng ngày có liên quan đến nguy cơ **tử vong** ngắn hạn hằng ngày hay không?
+:::
+:::
+
+::: {.column width="50%"}
+::: {.epi-card-amber}
+**Thiết kế nghiên cứu**
+
+- **Nghiên cứu chuỗi thời gian** (*time series regression*).
+- **Đơn vị thời gian:** Ngày lịch.
+- **Biến nhiễu:** Chỉ các yếu tố *biến thiên theo ngày* liên quan cả phơi nhiễm và kết cục (nhiệt độ, độ ẩm).
+:::
+:::
+::::
+
+::: {.fragment .fade-up}
+> **Điểm quan trọng:** Các yếu tố cá nhân (tuổi, giới, BMI, hút thuốc) **không gây nhiễu** vì không dao động theo ngày theo nồng độ ô nhiễm.
+:::
+
+## 2. Phương pháp nghiên cứu & Bộ dữ liệu {transition="slide"}
+
+::: {.kpi-grid}
+::: {.kpi-box}
+::: {.kpi-val}
+1.826
+:::
+::: {.kpi-lbl}
+Ngày quan sát liên tục (2002–2006)
+:::
+:::
+
+::: {.kpi-box}
+::: {.kpi-val}
+0%
+:::
+::: {.kpi-lbl}
+Tỷ lệ dữ liệu khuyết (Missing)
+:::
+:::
+
+::: {.kpi-box}
+::: {.kpi-val}
+149,5
+:::
+::: {.kpi-lbl}
+Ca tử vong TB / ngày
+:::
+:::
+
+::: {.kpi-box}
+::: {.kpi-val}
+34,8
+:::
+::: {.kpi-lbl}
+Ozone TB ngày (µg/m³)
+:::
+:::
+:::
+
+:::: {.columns}
+::: {.column width="48%"}
+**Bộ dữ liệu `londondataset2002_2006.dta`**
+
+4 chuỗi thời gian hàng ngày (01/01/2002 – 31/12/2006):
+:::
+
+::: {.incremental}
+1. `ozone` ($\mu\text{g/m}^3$) — Phơi nhiễm chính
+2. `numdeaths` (ca/ngày) — Kết cục chính
+3. `temperature` (°C) 
+4. `relative_humidity` (%) 
+:::
+
+::: {.column width="52%"}
+**Quy trình nghiên cứu 4 bước**
+
+::: {.incremental}
+1. Mô tả chuỗi thời gian & tương quan sơ bộ.
+2. Kiểm soát mùa vụ & xu hướng dài hạn (3 phương pháp).
+3. Ước lượng phơi nhiễm – kết cục & kiểm soát nhiễu nhiệt độ.
+4. Mô hình hóa hiệu ứng trễ (Lag 0–7 ngày).
+:::
+:::
+::::
+
+## 3. Phương pháp phân tích dữ liệu {transition="fade"}
+
+$$\log\big(E[Y_t]\big) = \alpha + \beta \cdot \text{Ozone}_{t} + s(t) + f(\text{Temp}_t)$$
+
+:::: {.columns}
+::: {.column width="50%"}
+::: {.epi-card}
+**Hồi quy Quasi-Poisson & Kiểm soát thời gian**
+
+- Xử lý biến kết cục dạng đếm có **quá phân tán (overdispersion)** bằng tham số tỷ lệ $\hat{\phi} = \chi^2_{\text{Pearson}}/\text{df}$.
+- So sánh 3 hàm kiểm soát mùa vụ & xu hướng $s(t)$:
+  - Phân tầng theo tháng lịch ($12 \times 5 = 60$ tầng).
+  - Chuỗi Fourier (4 cặp sin/cos + xu hướng tuyến tính).
+  - **Cubic B-spline** (`df = 35`, ~7 bậc tự do/năm).
+:::
+:::
+
+::: {.column width="50%"}
+::: {.epi-card-amber}
+**Nhiệt độ phi tuyến & Hiệu ứng trễ (`dlnm`)**
+
+- Nhiệt độ chia **10 tầng phân vị (deciles)** để nắm bắt quan hệ phi tuyến.
+- Mở rộng sang cửa sổ trễ **0–7 ngày**:
+  - *Single-lag:* Chạy riêng từng độ trễ $l = 0, \dots, 7$.
+  - *Unconstrained DLM:* Đưa đồng thời cả 8 độ trễ.
+  - *Constrained DLM:* Ràng buộc phân tầng (lag 1–2 bằng nhau; lag 3–7 bằng nhau) để giảm đa cộng tuyến.
+:::
+:::
+::::
+
+# 4. Kết quả và Nhận định {.dark-slide background-color="#005d88" transition="zoom"}
+
+## Table 1: Cấu trúc 12 dòng dữ liệu đầu tiên {transition="slide"}
+
+:::: {.columns}
+::: {.column width="68%"}
+```{r slide-table-1}
+tbl1 <- data |>
+  slice(1:12) |>
+  transmute(
+    `Ngày`        = format(date, "%d %b %Y"),
+    `Ozone (µg/m³)` = sprintf("%.2f", ozone),
+    `Nhiệt độ (°C)` = sprintf("%.1f", temperature),
+    `Độ ẩm (%)`     = sprintf("%.1f", relative_humidity),
+    `Tử vong (ca)`  = numdeaths
+  )
+style_slide_table(tbl1, font_sz = 12.5)
+```
+:::
+
+::: {.column width="32%"}
+::: {.epi-card}
+
+- Mỗi dòng biểu diễn **1 ngày quan sát liên tiếp**, đầy đủ cả 4 chuỗi thời gian.
+- Đầu tháng 1/2002 (mùa đông): nhiệt độ lạnh ($-0.2^\circ\text{C}$ đến $7.1^\circ\text{C}$), nồng độ ozone thấp (chủ yếu $< 5.2~\mu\text{g/m}^3$), nhưng tử vong ở mức cao (**168–231 ca/ngày**).
+- Gợi ý ban đầu về hiện tượng ngược pha theo mùa.
+:::
+:::
+::::
+
+## Figure 1: Diễn biến chuỗi thời gian dữ liệu thô {transition="slide"}
+
+:::: {.columns}
+::: {.column width="68%"}
+```{r slide-fig-1}
+#| fig-width: 8.2
+#| fig-height: 5.5
+
+p1a <- ggplot(data, aes(x = date, y = numdeaths)) +
+  geom_vline(xintercept = year_breaks, linetype = "dashed", color = "#94A3B8", linewidth = 0.4) +
+  geom_point(color = pal$navy, alpha = 0.48, size = 0.9) +
+  annotate("label", x = as.Date("2004-04-01"), y = 272, size = 3.0,
+           label = "Sóng nhiệt T8/2003\nĐỉnh: 280 ca", fill = "#FFF5F5", color = pal$red) +
+  scale_x_date(breaks = year_breaks, date_labels = "%Y") +
+  scale_y_continuous(limits = c(95, 305), breaks = seq(100, 300, 50)) +
+  labs(title = "(a) Số ca tử vong hằng ngày", x = NULL, y = "Số ca / ngày") +
+  theme_slide(11)
+
+p1b <- ggplot(data, aes(x = date, y = ozone)) +
+  geom_vline(xintercept = year_breaks, linetype = "dashed", color = "#94A3B8", linewidth = 0.4) +
+  geom_point(color = pal$teal, alpha = 0.50, size = 0.9) +
+  scale_x_date(breaks = year_breaks, date_labels = "%Y") +
+  scale_y_continuous(limits = c(0, 150), breaks = seq(0, 150, 50)) +
+  labs(title = "(b) Nồng độ ozone trung bình ngày", x = "Năm", y = expression(bold("Ozone ("*mu*"g/m"^3*")"))) +
+  theme_slide(11)
+
+p1a / p1b
+```
+:::
+
+::: {.column width="32%"}
+::: {.epi-card}
+
+- **Ngược pha mùa vụ:** Tử vong cao mùa đông / thấp mùa hè; ozone cao mùa hè / thấp mùa đông.
+- Tương quan âm ($r = `r sprintf("%.3f", cor(data$ozone, data$numdeaths))`$) nhưng **không thể suy diễn nhân quả**.
+- Ozone tương quan dương với nhiệt độ ($r = `r sprintf("%.3f", cor(data$ozone, data$temperature))`$).
+- Ghi nhận đỉnh sóng nhiệt tháng 8/2003 (280 ca tử vong/ngày).
+:::
+:::
+::::
+
+## Figure 2: Kiểm soát mùa vụ và xu hướng dài hạn {transition="slide"}
+
+:::: {.columns}
+::: {.column width="67%"}
+```{r slide-fig-2}
+#| fig-width: 8.2
+#| fig-height: 5.7
+
+mk_p2 <- function(col_name, title_txt, col_hex, x_lbl = NULL) {
+  ggplot(data, aes(x = date, y = numdeaths)) +
+    geom_vline(xintercept = year_breaks, linetype = "dashed", color = "#CBD5E1", linewidth = 0.35) +
+    geom_point(color = "#94A3B8", alpha = 0.42, size = 0.7) +
+    geom_line(aes(y = .data[[col_name]]), color = col_hex, linewidth = 1.0) +
+    scale_x_date(breaks = year_breaks, date_labels = "%Y") +
+    scale_y_continuous(limits = c(100, 300), breaks = seq(100, 300, 100)) +
+    labs(title = title_txt, x = x_lbl, y = "Tử vong") +
+    theme_slide(10.5)
+}
+
+mk_p2("pred1", "(a) Time-stratified (60 tầng tháng)", pal$blue) /
+mk_p2("pred2", "(b) Fourier series (4 cặp hài + xu hướng tuyến tính)", pal$teal) /
+mk_p2("pred3", "(c) Flexible cubic spline (df = 35; ~7 df/năm)", pal$navy, "Năm")
+```
+:::
+
+::: {.column width="33%"}
+::: {.epi-card}
+**So sánh 3 phương pháp**
+
+- **(a) Phân tầng tháng:** Dễ hiểu nhưng tạo bước nhảy nguy cơ phi sinh học giữa các tháng, nhiều tham số.
+- **(b) Chuỗi Fourier:** Mượt, ít tham số nhưng ép hình dạng sóng mùa giống hệt nhau qua các năm.
+- **(c) Cubic spline (Tối ưu):** Mượt, cho phép chu kỳ mùa thay đổi linh hoạt từng năm và bắt đồng thời xu hướng dài hạn.
+:::
+:::
+::::
+
+## Figure 3: Phần dư sau loại bỏ mùa vụ & xu hướng {transition="slide"}
+
+:::: {.columns}
+::: {.column width="67%"}
+```{r slide-fig-3}
+#| fig-width: 8.2
+#| fig-height: 5.2
+
+ggplot(data, aes(x = date, y = res3)) +
+  geom_vline(xintercept = year_breaks, linetype = "dashed", color = "#CBD5E1", linewidth = 0.4) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = pal$red, linewidth = 0.85) +
+  geom_point(color = pal$navy, alpha = 0.52, size = 1.05) +
+  scale_x_date(breaks = year_breaks, date_labels = "%Y") +
+  scale_y_continuous(limits = c(-55, 150), breaks = seq(-50, 150, 50)) +
+  labs(
+    title = "Phần dư số ca tử vong hằng ngày (Observed − Fitted)",
+    subtitle = "Từ mô hình cubic spline (df = 35)",
+    x = "Năm",
+    y = "Phần dư (ca tử vong)"
+  ) +
+  theme_slide(11.5)
+```
+:::
+
+::: {.column width="33%"}
+::: {.epi-card}
+
+- Toàn bộ quy luật mùa vụ và xu hướng dài hạn đã được loại bỏ hoàn toàn; phần dư dao động đối xứng quanh $0$.
+- Phần biến thiên ngắn hạn còn lại là cơ sở kiểm định vai trò của ozone từng ngày.
+- Các đỉnh phần dư dương (> 80–130 ca) tháng 8/2003 nhấn mạnh nhu cầu hiệu chỉnh **nhiệt độ**.
+:::
+:::
+::::
+
+## Hiệu chỉnh nhiễu Ozone – Tử vong tại Lag 0 {transition="convex"}
+
+```{r slide-tbl-2}
+tbl2 <- bind_rows(
+  eff4 |> mutate(Model = "Mô hình Poisson thô (Chưa hiệu chỉnh)"),
+  eff5 |> mutate(Model = "Mô hình + Mùa vụ & xu hướng (Cubic spline)"),
+  eff6 |> mutate(Model = "Mô hình + Nhiệt độ cùng ngày (Thập phân vị)")
+) |>
+  transmute(
+    `Mô hình (Lag 0)`      = Model,
+    `RR (mỗi +10 µg/m³)`   = sprintf("%.3f", rr),
+    `95% CI`               = sprintf("%.3f – %.3f", ci_low, ci_hi),
+    `Thay đổi nguy cơ (%)` = sprintf("%+.2f%%", pct),
+    `Giá trị P`            = fmt_p(pval)
+  )
+style_slide_table(tbl2, font_sz = 14)
+```
+
+<br>
+
+:::: {.columns}
+::: {.column width="50%"}
+::: {.epi-card}
+**1. Đảo chiều do nhiễu mùa vụ (M4 $\rightarrow$ M5)**
+
+- Mô hình thô cho kết quả âm tính giả tạo ($\text{RR} = `r sprintf("%.3f", eff4$rr)`$).
+- Sau hiệu chỉnh mùa vụ/xu hướng, ozone liên quan dương tính rõ rệt: tăng **`r sprintf("%.1f%%", eff5$pct)`** nguy cơ tử vong mỗi $+10~\mu\text{g/m}^3$ ($p < 0.001$).
+:::
+:::
+
+::: {.column width="50%"}
+::: {.epi-card-amber}
+**2. Nhiễu do nhiệt độ cùng ngày (M5 $\rightarrow$ M6)**
+
+- Bổ sung nhiệt độ phi tuyến làm ước lượng tiến về 1 ($\text{RR} = `r sprintf("%.3f", eff6$rr)`$, $p = `r sprintf("%.2f", eff6$pval)`$) và **không còn ý nghĩa thống kê**.
+$\Rightarrow$ Tác động ozone *cùng ngày* chủ yếu do nhiệt độ gây nhiễu!
+:::
+:::
+::::
+
+## Figure 4: Mô hình hóa hiệu ứng trễ (Lag 0–7 ngày) {transition="slide"}
+
+:::: {.columns}
+::: {.column width="66%"}
+```{r slide-fig-4}
+#| fig-width: 8.3
+#| fig-height: 5.8
+
+prep_lag <- function(df, net_df = NULL) {
+  out <- df |> mutate(x_pos = lag, kind = ifelse(ci_low > 1 | ci_hi < 1, "Có ý nghĩa", "Không ý nghĩa"))
+  if (!is.null(net_df)) {
+    out <- bind_rows(out, net_df |> mutate(lag = NA_integer_, x_pos = 8.4, kind = "Net effect (0–7 ngày)"))
+  }
+  out
+}
+
+cols4 <- c("Có ý nghĩa" = pal$navy, "Không ý nghĩa" = pal$slate, "Net effect (0–7 ngày)" = pal$amber)
+shps4 <- c("Có ý nghĩa" = 16, "Không ý nghĩa" = 16, "Net effect (0–7 ngày)" = 15)
+
+mk_p4 <- function(df, title_txt, has_net = FALSE, show_x = FALSE, show_leg = FALSE) {
+  p <- ggplot(df, aes(x = x_pos, y = rr, color = kind, shape = kind)) +
+    geom_hline(yintercept = 1, linetype = "dashed", color = "#334155", linewidth = 0.65) +
+    geom_errorbar(aes(ymin = ci_low, ymax = ci_hi), width = 0.18, linewidth = 0.7) +
+    geom_point(size = 2.7) +
+    scale_color_manual(values = cols4, drop = FALSE) +
+    scale_shape_manual(values = shps4, drop = FALSE) +
+    scale_x_continuous(limits = c(-0.4, 10.8), breaks = 0:7, labels = as.character(0:7)) +
+    scale_y_continuous(limits = c(0.990, 1.032), breaks = seq(0.99, 1.03, 0.01)) +
+    labs(title = title_txt, x = if (show_x) "Lag (ngày)" else NULL, y = "RR (95% CI)", color = NULL, shape = NULL) +
+    theme_slide(10) +
+    theme(legend.position = if (show_leg) "top" else "none")
+  if (has_net) {
+    net_r <- df |> filter(x_pos > 8)
+    p <- p +
+      geom_vline(xintercept = 7.75, linetype = "dotted", color = "#94A3B8") +
+      geom_text(
+        data = net_r,
+        aes(x = x_pos, y = ci_hi + 0.0028, label = "Net effect"),
+        vjust = 0, hjust = 0.5, size = 3.0, fontface = "bold", show.legend = FALSE
+      ) +
+      geom_text(
+        data = net_r,
+        aes(x = x_pos + 0.28, y = rr, label = sprintf("RR = %.3f\n(%.3f–%.3f)", rr, ci_low, ci_hi)),
+        hjust = 0, vjust = 0.5, size = 2.75, fontface = "bold", lineheight = 0.95, show.legend = FALSE
+      )
+  }
+  p
+}
+
+mk_p4(prep_lag(tablag_single), "(a) Single-lag (từng độ trễ riêng lẻ)", FALSE, FALSE, TRUE) /
+mk_p4(prep_lag(tablag_unc, net_unc), "(b) Unconstrained DLM (đồng thời lag 0–7)", TRUE, FALSE, FALSE) /
+mk_p4(prep_lag(tablag_constr, net_constr), "(c) Constrained DLM (ràng buộc lag 1–2 & lag 3–7)", TRUE, TRUE, FALSE)
+```
+:::
+
+::: {.column width="34%"}
+::: {.epi-card}
+
+- **(a) Single-lag:** Có ý nghĩa thống kê từ lag 1–5 nhưng bị **nhiễu lẫn nhau** giữa các ngày liền kề.
+- **(b) Unconstrained DLM:** Chỉ còn tác động độc lập tại **lag 1 ($\text{RR}=`r sprintf("%.3f", tablag_unc$rr[2])`$)** và **lag 2 ($\text{RR}=`r sprintf("%.3f", tablag_unc$rr[3])`$)**.
+- **(c) Constrained DLM:** Giảm đa cộng tuyến, thu hẹp 95% CI từng lag rõ rệt.
+- **Net effect (0–7 ngày):** $\text{RR} = `r sprintf("%.3f", net_unc$rr)`$ (95% CI: `r sprintf("%.3f–%.3f", net_unc$ci_low, net_unc$ci_hi)`), ổn định giữa cả hai mô hình DLM; không thấy hiện tượng mùa vụa rõ rệt.
+:::
+:::
+::::
+
+## 5. Kết luận chính {transition="zoom"}
+
+:::: {.columns}
+::: {.column width="50%"}
+::: {.epi-card}
+**Phát hiện từ bộ dữ liệu London (2002–2006)**
+
+- Kiểm soát mùa vụ/xu hướng đảo ngược ước lượng ozone từ âm tính giả tạo ($0.991$) sang dương tính ($1.007$).
+- Nhiệt độ giải thích phần lớn tác động ozone cùng ngày ($\text{RR}_{\text{lag 0}} = 1.003, p = 0.11$).
+- **Tác động trễ độc lập rõ rệt tại lag 1–2 ngày**, với hiệu ứng cộng dồn 0–7 ngày là **$\text{RR} = `r sprintf("%.3f", net_unc$rr)`$** (tăng `r sprintf("%.2f%%", (net_unc$rr - 1) * 100)` nguy cơ tử vong mỗi $+10~\mu\text{g/m}^3$ ozone).
+:::
+:::
+
+::: {.column width="50%"}
+::: {.epi-card-amber}
+**Bài học phương pháp luận**
+
+- Hồi quy chuỗi thời gian giải quyết 4 thách thức đặc thù: **mùa vụ/xu hướng dài hạn**, **hiệu ứng trễ & đa cộng tuyến**, **quan hệ phi tuyến**, và **quá phân tán / tự tương quan**.
+- Quy trình cốt lõi vẫn đồng nhất với dịch tễ học kinh điển: khám phá dữ liệu $\rightarrow$ kiểm soát nhiễu có cơ sở sinh học $\rightarrow$ trình bày ước lượng chuẩn $\rightarrow$ chẩn đoán và phân tích độ nhạy.
+:::
+:::
+::::
